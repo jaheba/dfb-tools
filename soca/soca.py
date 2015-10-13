@@ -2,8 +2,8 @@
 
 import click
 
-from model import Player
 import query
+
 
 class Config(object):
     def __init__(self):
@@ -11,10 +11,12 @@ class Config(object):
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
 
+
 @click.group()
 @pass_config
 def cli(config):
     config.foo = 'bar'
+
 
 @cli.command()
 @click.argument('identifier')
@@ -23,6 +25,7 @@ def player(config, identifier):
     for player in query.get_players(identifier):
         click.echo(player)
 
+
 @cli.command()
 @click.argument('identifier')
 @pass_config
@@ -30,12 +33,14 @@ def match(config, identifier):
     for match in query.get_matches(identifier):
         click.echo(match)
 
+
 @cli.command()
 @click.argument('identifier')
 @pass_config
 def team(config, identifier):
     for team in query.get_teams(identifier):
         click.echo(team)
+
 
 @cli.command()
 @click.argument('milliseconds', type=click.INT)

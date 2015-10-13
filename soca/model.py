@@ -1,6 +1,7 @@
 
 import click
 
+
 class Player(object):
     def __init__(self, name, opta_id, id):
         self.name = name
@@ -41,6 +42,7 @@ Video: {video}'''.format(
             id=self.id,
             video=int(self.opta_id.split('-')[-1], 36)
         )
+
 
 class Team(object):
     def __init__(self, id, name, code, opta_id):
