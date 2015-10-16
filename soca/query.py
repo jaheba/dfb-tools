@@ -12,8 +12,8 @@ OPTA_RE = re.compile(r'DFL-...-.+')
 
 def execute(query, arguments):
     connection = pyhdb.connect(
-        config.HOST, config.PORT,
-        config.USER, config.PASSWORD
+        config.host, config.port,
+        config.user, config.password
     )
 
     cur = connection.cursor()
