@@ -7,6 +7,9 @@ user = ''
 password = ''
 
 import util
-_config = util.find_file('.socarc')
+import os
+
+_config = os.env.get('SOCA_CONFIG') or util.find_file('.socarc')
+
 if _config:
     locals().update(util.read_config(_config))
