@@ -22,7 +22,7 @@ def team_id(elem):
         return 0
     return convert_id(team)
 
-def convert(infile, outfile):
+def convert_positions(infile, outfile):
     pos_writer = csv.writer(outfile)
 
     context = etree.iterparse(infile)
@@ -47,3 +47,16 @@ def convert(infile, outfile):
 
             elem.clear()
 
+def convert_players(infile, outfile):
+    player_writer = csv.writer(outfile)
+    context = etree.iterparse(infile)
+
+    for _, elem in context:
+        if elem.tag == 'Object':
+            opta_id = convert_id(elem.get('ObjectId'))
+            first_name = elem.get('FirstName').encode('utf-8')
+            last_name = elem.get('LastName').encode('utf-8')
+            shirt = elem.get('ShirtNumber')
+            club = convert_id(elem.get('ClubId'))
+
+            player_writer.writerow([opta_id, club, first_name, last_name, shirt])

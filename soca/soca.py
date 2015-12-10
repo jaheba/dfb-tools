@@ -54,11 +54,21 @@ def time(milliseconds):
     s, ms = divmod(r, 10)
     click.echo('%s:%02d.%s' % (m, s, ms))
 
-@cli.command(help='Convert opta position xml file to csv')
+@cli.group(help='Convert opta position xml file to csv')
+def convert():
+    pass
+
+@convert.command()
 @click.argument('input', type=click.File('rb'))
 @click.argument('output', type=click.File('wb'))
-def convert(input, output):
-    parsing.convert(input, output)
+def position(input, output):
+    parsing.convert_positions(input, output)
+
+@convert.command()
+@click.argument('input', type=click.File('rb'))
+@click.argument('output', type=click.File('wb'))
+def player(input, output):
+    parsing.convert_players(input, output)
 
 if __name__ == '__main__':
     cli()
