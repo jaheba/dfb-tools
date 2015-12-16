@@ -1,9 +1,8 @@
-
+import csv
 
 import click
 
 import query
-
 import parsing
 
 
@@ -17,7 +16,7 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
 @click.group()
 @pass_config
 def cli(config):
-    config.foo = 'bar'
+    pass
 
 @cli.group(help='Search for entities (player, match, team)')
 def search():
@@ -69,6 +68,34 @@ def position(input, output):
 @click.argument('output', type=click.File('wb'))
 def player(input, output):
     parsing.convert_players(input, output)
+
+
+# parse
+@cli.group()
+def parse():
+    pass
+
+@parse.command()
+@click.argument('input', type=click.File('rb'))
+@click.argument('output', type=click.File('wb'))
+@click.option('--match')
+@click.option('--10/--25', 'freq', default=True)
+@click.option('--step', default=1, type=int)
+def status(input, output, match, freq, step):
+    freq = 10 if freq else 25
+    status = parsing.BallStatus(input)
+
+    if freq == 10:
+        result = status.r10
+    else:
+        result = status.result
+
+    writer = csv.writer(output)
+
+    for period in [1, 2]:
+        for n, status in enumerate(result[period]):
+            time = step*n
+            writer.writerow((match, period, time, status))
 
 if __name__ == '__main__':
     cli()

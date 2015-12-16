@@ -8,6 +8,10 @@ def convert_id(opta_id):
     return int(suffix, 36)
 
 
+def get_period(elem):
+    return 1 + (elem.get('GameSection') == 'secondHalf')
+
+
 def player_id(elem):
     if team_id(elem) == 0:
         return 0
@@ -22,6 +26,54 @@ def team_id(elem):
         return 0
     return convert_id(team)
 
+class BallStatus(object):
+    def __init__(self, infile):
+        self.infile = infile
+        self._result = None
+
+    def parse(self):
+        context = etree.iterparse(self.infile)
+        result = {}
+
+        for _, elem in context:
+            if elem.tag == 'FrameSet':
+                if elem.get('TeamId') != 'Ball':
+                    elem.clear()
+                    continue
+
+                period = int(get_period(elem))
+
+                result[period] = [node.get('BallStatus') for node in elem]
+
+                if len(result) == 2:
+                    break
+
+        self._result = result
+        return result
+
+    @property
+    def result(self):
+        if self._result is None:
+            self.parse()
+        return self._result
+
+    @property
+    def r10(self):
+        r = self.result
+        return {
+            1: list(self._convert(r[1])),
+            2: list(self._convert(r[2]))
+        }
+
+    def _convert(self, period):
+        seq = iter(period)
+        for status in seq:
+            yield seq.next()
+            seq.next()
+            yield seq.next() or seq.next()
+            seq.next()
+
+
 def convert_positions(infile, outfile):
     pos_writer = csv.writer(outfile)
 
@@ -34,7 +86,7 @@ def convert_positions(infile, outfile):
             team = team_id(elem)
             
             match = convert_id(elem.get('MatchId') or elem.get('Match'))
-            period = 1+ (elem.get('GameSection') == 'secondHalf')
+            period = get_period(elem)
 
             for n, frame in enumerate(elem):
                 #to centi seconds (1/100 s)
